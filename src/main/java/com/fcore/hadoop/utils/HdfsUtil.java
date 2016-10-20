@@ -1,8 +1,6 @@
 package com.fcore.hadoop.utils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -29,10 +27,8 @@ public class HdfsUtil {
 	/**
 	 * 上传本地文件到HDFS
 	 * 
-	 * @param local
-	 *            本地文件
-	 * @param remote
-	 *            远程文件
+	 * @param local  本地文件
+	 * @param remote  远程文件
 	 * @throws Exception
 	 */
 	public static void uploadLocalFileToHDFS(String local, String remote) {
@@ -40,7 +36,6 @@ public class HdfsUtil {
 		FileSystem fileSystem = null;
 		try {
 			fileSystem = FileSystem.get(conf);
-			fileSystem.getConf().set("dfs.blocksize","67108864");
 			Path localPath = new Path(local);
 			Path remotePath = new Path(remote);
 			Long start = System.currentTimeMillis();
@@ -78,11 +73,13 @@ public class HdfsUtil {
 				}
 			});
 			IOUtils.copyBytes(in, out, 4096, true);
+			out.hflush(); //语义是保证flush的数据被新的reader读到，但是不保证数据被datanode持久化.
+			out.hsync(); //与hflush几乎一样，不同的是hsync保证数据被datanode持久化。
 			System.out.println("create file in hdfs:" + hdfsPath);
 		}catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if(out!=null){
+			if(out!=null){ //关闭文件.除了做到以上2点，还保证文件的所有block处于completed状态，并且将文件置为closed
 				IOUtils.closeStream(out);
 			}
 			if(in!=null){
@@ -220,16 +217,17 @@ public class HdfsUtil {
 	}
 
 	public static void main(String[] args) {
-		// mkdir(CommonConstants.HDFS_BASE_PATH, "test");
-		// uploadLocalFileToHDFS("E:/2016/9/8/1bc51dc1-9655-49d8-8f3d-252498e25fdf.pdf","/home/hdp/hadoop/hdfs/name/test/c.txt");
-		try {
+		 //mkdir(CommonConstants.HDFS_BASE_PATH, "output");
+		uploadLocalFileToHDFS("E:/2016/9/8/f03.txt","/home/hdp/hadoop/hdfs/name/input/f03.txt");
+		/*try {
 			InputStream in = new BufferedInputStream(new FileInputStream("E:/2016/9/8/2a0d2ad1-21f1-4b25-b0ef-9981cdaebacf.mp4"));
 			System.out.println(in.available());
 			uploadFileToHDFS(in, "/home/hdp/hadoop/hdfs/name/test/b.mp4");
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		// System.out.println(delFile(CommonConstants.HDFS_BASE_PATH+File.separator+"test"));
 		//getDirectoryFromHdfs("/home/hdp/hadoop/hdfs/name/");
+		//delFile("/home/hdp/hadoop/hdfs/name/output");
 	}
 }
