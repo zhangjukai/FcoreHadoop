@@ -14,14 +14,14 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.util.Progressable;
 
-import com.fcore.hadoop.bean.CommonConstants;
+import static com.fcore.hadoop.bean.CommonConstants.*;
 
 public class HdfsUtil {
 	// hadoop fs的配置文
 	static Configuration conf = new Configuration(true);
 	static {
-		conf.set("fs.defaultFS", CommonConstants.DEFAULT_FS);
-		System.setProperty("HADOOP_USER_NAME", CommonConstants.HADOOP_USER_NAME);
+		conf.set("fs.defaultFS", DEFAULT_FS);
+		System.setProperty("HADOOP_USER_NAME", HADOOP_USER_NAME);
 	}
 
 	/**
@@ -218,7 +218,7 @@ public class HdfsUtil {
 
 	public static void main(String[] args) {
 		 //mkdir(CommonConstants.HDFS_BASE_PATH, "output");
-		uploadLocalFileToHDFS("E:/2016/9/8/f03.txt","/home/hdp/hadoop/hdfs/name/input/f03.txt");
+		//uploadLocalFileToHDFS("E:/2016/9/8/f03.txt","/home/hdp/hadoop/hdfs/name/input/f03.txt");
 		/*try {
 			InputStream in = new BufferedInputStream(new FileInputStream("E:/2016/9/8/2a0d2ad1-21f1-4b25-b0ef-9981cdaebacf.mp4"));
 			System.out.println(in.available());
@@ -229,5 +229,9 @@ public class HdfsUtil {
 		// System.out.println(delFile(CommonConstants.HDFS_BASE_PATH+File.separator+"test"));
 		//getDirectoryFromHdfs("/home/hdp/hadoop/hdfs/name/");
 		//delFile("/home/hdp/hadoop/hdfs/name/output");
+		
+		System.out.println("hadoop.common.configuration.version:"+conf.get("hadoop.common.configuration.version"));
+		System.out.println("hadoop.tmp.dir:"+conf.get("hadoop.tmp.dir"));
+		System.out.println("dfs.blocksize:"+conf.get("dfs.blocksize"));
 	}
 }
